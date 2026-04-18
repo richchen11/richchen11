@@ -67,7 +67,7 @@
     const PADDLE_SPEED = 5;
     const WIN_SCORE = 7;
 
-    let state = 'idle';
+    let state = 'idle'; // idle | playing | paused | won
 
     const ball = {
       x: W / 2, y: H / 2,
@@ -134,9 +134,11 @@
       ball.x += ball.vx;
       ball.y += ball.vy;
 
+      // Top / bottom wall
       if (ball.y <= 0) { ball.y = 0; ball.vy *= -1; }
       if (ball.y + BALL_SIZE >= H) { ball.y = H - BALL_SIZE; ball.vy *= -1; }
 
+      // Left paddle collision
       const lp = paddles.left;
       if (
         ball.vx < 0 &&
@@ -149,6 +151,7 @@
         reflect(lp);
       }
 
+      // Right paddle collision
       const rp = paddles.right;
       if (
         ball.vx > 0 &&
@@ -161,6 +164,7 @@
         reflect(rp);
       }
 
+      // Score
       if (ball.x < 0) {
         paddles.right.score++;
         checkWin('right');
@@ -175,7 +179,7 @@
 
     function reflect(paddle) {
       const center   = paddle.y + PADDLE_H / 2;
-      const hit      = (ball.y + BALL_SIZE / 2 - center) / (PADDLE_H / 2);
+      const hit      = (ball.y + BALL_SIZE / 2 - center) / (PADDLE_H / 2); // -1 to 1
       const maxAngle = 60 * (Math.PI / 180);
       const angle    = hit * maxAngle;
       ball.speed     = Math.min(ball.speed + 0.3, 14);
@@ -197,6 +201,7 @@
       ctx.fillStyle = '#111';
       ctx.fillRect(0, 0, W, H);
 
+      // Center dashes
       ctx.setLineDash([10, 15]);
       ctx.strokeStyle = '#444';
       ctx.lineWidth = 2;
@@ -206,6 +211,7 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
+      // Scores
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 3rem Courier New';
       ctx.textAlign = 'right';
@@ -213,10 +219,12 @@
       ctx.textAlign = 'left';
       ctx.fillText(paddles.right.score, W / 2 + 30, 70);
 
+      // Paddles
       ctx.fillStyle = '#fff';
       ctx.fillRect(lp.x, lp.y, PADDLE_W, PADDLE_H);
       ctx.fillRect(rp.x, rp.y, PADDLE_W, PADDLE_H);
 
+      // Ball
       ctx.fillRect(ball.x, ball.y, BALL_SIZE, BALL_SIZE);
     }
 
