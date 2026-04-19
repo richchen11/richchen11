@@ -84,6 +84,8 @@
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const game = tab.dataset.game;
+        const current = document.querySelector('iframe.active');
+        if (current) try { current.contentWindow.postMessage('pause', '*'); } catch (_) {}
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('iframe').forEach(f => f.classList.remove('active'));
         tab.classList.add('active');
