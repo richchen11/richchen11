@@ -211,6 +211,10 @@
     function pauseGame()  { state = 'paused'; showOverlay('PAUSED', 'Press SPACE or tap to resume'); }
     function resumeGame() { state = 'playing'; hideOverlay(); }
 
+    window.addEventListener('message', e => {
+      if (e.data === 'pause' && state === 'playing') pauseGame();
+    });
+
     function launchBall() {
       ball.x = W / 2; ball.y = H / 2; ball.speed = 5;
       const angle = (Math.random() * 60 - 30) * (Math.PI / 180);

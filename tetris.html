@@ -605,6 +605,10 @@
     document.getElementById('tc-hold').addEventListener('click',  holdPiece);
     document.getElementById('ov-btn').addEventListener('click',   init);
 
+    window.addEventListener('message', e => {
+      if (e.data === 'pause' && !paused && !gameOver) paused = true;
+    });
+
     window.addEventListener('resize', resize);
 
     resize();
