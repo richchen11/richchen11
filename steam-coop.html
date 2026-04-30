@@ -5,192 +5,354 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Steam Co-op Shooters</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black:       #000;
+      --near-black:  #1d1d1f;
+      --gray-1:      #424245;
+      --gray-2:      #6e6e73;
+      --gray-3:      #86868b;
+      --light-bg:    #f5f5f7;
+      --separator:   #d2d2d7;
+      --white:       #fff;
+      --blue:        #0071e3;
+      --blue-hover:  #0077ed;
+      --green:       #34c759;
+      --red:         #ff3b30;
+      --font:        -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                     "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
 
     body {
-      background: #0d1117;
-      color: #e6edf3;
-      font-family: 'Courier New', monospace;
-      min-height: 100dvh;
-      padding: 1.5rem 1rem 3rem;
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--near-black);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
-    header {
-      max-width: min(1100px, 98vw);
-      margin: 0 auto 1.5rem;
+    /* ── Nav ───────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(29, 29, 31, 0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    h1 {
-      font-size: clamp(1.4rem, 5vw, 2.2rem);
-      font-weight: 900;
-      color: #e94560;
-      letter-spacing: 0.15rem;
-      margin-bottom: 0.3rem;
+    .nav-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .subtitle { font-size: 0.82rem; color: #8b949e; }
+    .nav-inner span {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.92);
+      letter-spacing: -0.01em;
+    }
 
-    /* ── Filters ───────────────────────────────────────────── */
-    .filters {
-      max-width: min(1100px, 98vw);
-      margin: 0 auto 1rem;
+    /* ── Hero ──────────────────────────────────────────────── */
+    .hero {
+      background: var(--black);
+      text-align: center;
+      padding: 5rem 1.5rem 4.5rem;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 1.1rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 7vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.07;
+      color: var(--white);
+      margin-bottom: 1.1rem;
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      font-weight: 400;
+      line-height: 1.5;
+      letter-spacing: 0.005em;
+      color: var(--gray-2);
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    /* ── Filter bar ────────────────────────────────────────── */
+    .filter-bar {
+      background: var(--light-bg);
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid var(--separator);
+    }
+
+    .filter-inner {
+      max-width: 980px;
+      margin: 0 auto;
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: 0.75rem;
-      align-items: center;
     }
 
-    .filter-group {
+    .filter-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-2);
+      letter-spacing: 0.01em;
+      margin-right: 0.25rem;
+    }
+
+    .pill-group {
       display: flex;
-      align-items: center;
       gap: 0.4rem;
+      flex-wrap: wrap;
     }
 
-    .filter-group label {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #8b949e;
-      white-space: nowrap;
-    }
-
-    .filter-group select {
-      background: #161b22;
-      color: #e6edf3;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      padding: 0.3rem 0.6rem;
-      font-family: inherit;
-      font-size: 0.78rem;
+    .pill {
+      appearance: none;
+      background: var(--white);
+      border: 1px solid var(--separator);
+      border-radius: 980px;
+      padding: 0.35rem 1rem;
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--near-black);
       cursor: pointer;
-      outline: none;
-    }
-
-    .filter-group select:focus { border-color: #e94560; }
-
-    .count {
-      margin-left: auto;
-      font-size: 0.72rem;
-      color: #8b949e;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
       white-space: nowrap;
     }
 
-    .count span { color: #e94560; font-weight: 700; }
+    .pill:hover  { background: #e8e8ed; }
+    .pill.active {
+      background: var(--near-black);
+      border-color: var(--near-black);
+      color: var(--white);
+    }
 
-    /* ── Table wrapper ─────────────────────────────────────── */
-    .table-wrap {
-      max-width: min(1100px, 98vw);
+    .filter-count {
+      margin-left: auto;
+      font-size: 0.8rem;
+      color: var(--gray-3);
+      letter-spacing: 0.01em;
+    }
+
+    .filter-count strong { color: var(--near-black); }
+
+    /* ── Table section ─────────────────────────────────────── */
+    .table-section {
+      max-width: 980px;
       margin: 0 auto;
-      overflow-x: auto;
-      border: 1px solid #30363d;
-      border-radius: 10px;
+      padding: 0 1rem 4rem;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 620px;
-    }
-
-    thead {
-      background: #161b22;
-      position: sticky;
-      top: 0;
-      z-index: 1;
+      margin-top: 0.5rem;
     }
 
     thead th {
-      padding: 0.75rem 1rem;
+      padding: 1.25rem 1rem 0.75rem;
       text-align: left;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #8b949e;
-      border-bottom: 1px solid #30363d;
-      white-space: nowrap;
+      letter-spacing: 0.06em;
+      color: var(--gray-3);
+      border-bottom: 1px solid var(--separator);
     }
 
     tbody tr {
-      border-bottom: 1px solid #21262d;
-      transition: background 0.12s;
+      border-bottom: 1px solid var(--separator);
+      transition: background 0.1s;
     }
 
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
-    tbody tr:hover { background: #161b22; }
+    tbody tr:hover { background: var(--light-bg); }
 
     tbody td {
-      padding: 0.85rem 1rem;
-      font-size: 0.82rem;
+      padding: 1.25rem 1rem;
       vertical-align: top;
-    }
-
-    .game-name { font-weight: 700; color: #e6edf3; white-space: nowrap; }
-
-    .players { white-space: nowrap; color: #e6edf3; }
-    .players-icon { color: #e94560; margin-right: 0.25rem; }
-    .price { color: #8b949e; white-space: nowrap; }
-
-    .pros-list, .cons-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .pros-list li::before { content: '+ '; color: #3fb950; font-weight: 700; }
-    .cons-list li::before { content: '- '; color: #f85149; font-weight: 700; }
-
-    .pros-list li, .cons-list li {
-      font-size: 0.78rem;
-      color: #c9d1d9;
+      font-size: 0.9rem;
       line-height: 1.5;
     }
 
+    .game-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--near-black);
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .player-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--light-bg);
+      border: 1px solid var(--separator);
+      border-radius: 980px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--gray-1);
+      white-space: nowrap;
+    }
+
+    .player-badge svg { width: 12px; height: 12px; opacity: 0.6; }
+
+    .price-tag {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--gray-1);
+      white-space: nowrap;
+    }
+
+    .price-free {
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    .list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .list li {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.84rem;
+      color: var(--gray-1);
+      line-height: 1.4;
+    }
+
+    .list li .icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 900;
+    }
+
+    .pros-list .icon { background: #d1fae5; color: #065f46; }
+    .cons-list .icon { background: #fee2e2; color: #991b1b; }
+
+    /* ── Empty state ───────────────────────────────────────── */
     #empty-msg {
       display: none;
-      padding: 3rem;
       text-align: center;
-      color: #8b949e;
-      font-size: 0.85rem;
+      padding: 5rem 1rem;
+      color: var(--gray-3);
     }
+
+    #empty-msg p { font-size: 1.05rem; font-weight: 500; margin-bottom: 0.5rem; }
+    #empty-msg small { font-size: 0.85rem; }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    footer {
+      background: var(--light-bg);
+      border-top: 1px solid var(--separator);
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 0.75rem;
+      color: var(--gray-3);
+      line-height: 1.6;
+    }
+
+    /* ── Table overflow on mobile ──────────────────────────── */
+    .table-overflow {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table { min-width: 600px; }
+
+    /* ── Hidden rows ───────────────────────────────────────── */
+    tr.hidden { display: none; }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Steam Co-op Shooters</h1>
-    <p class="subtitle">Pros &amp; cons of popular online co-op shooter games on Steam — filter by player count</p>
-  </header>
-
-  <div class="filters">
-    <div class="filter-group">
-      <label for="f-players">Players</label>
-      <select id="f-players">
-        <option value="all">Any count</option>
-        <option value="2">2 players</option>
-        <option value="4">Up to 4</option>
-        <option value="6plus">6 or more</option>
-      </select>
+  <nav>
+    <div class="nav-inner">
+      <span>Steam Co-op Shooters</span>
     </div>
-    <div class="count">Showing <span id="count">10</span> of 10 games</div>
+  </nav>
+
+  <section class="hero">
+    <p class="hero-eyebrow">Online Co-op · Steam</p>
+    <h1>The Best Co-op<br>Shooters on Steam</h1>
+    <p>An honest breakdown of the top co-op shooters — what they get right, what they don't, and how many friends you'll need.</p>
+  </section>
+
+  <div class="filter-bar">
+    <div class="filter-inner">
+      <span class="filter-label">Players</span>
+      <div class="pill-group" id="pill-group">
+        <button class="pill active" data-filter="all">All</button>
+        <button class="pill" data-filter="2">2 Players</button>
+        <button class="pill" data-filter="4">Up to 4</button>
+        <button class="pill" data-filter="6plus">6 or More</button>
+      </div>
+      <span class="filter-count" id="filter-count">Showing <strong>10</strong> of 10 games</span>
+    </div>
   </div>
 
-  <div class="table-wrap">
-    <table id="game-table">
-      <thead>
-        <tr>
-          <th>Game</th>
-          <th>Players</th>
-          <th>Price</th>
-          <th>Pros</th>
-          <th>Cons</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-    <div id="empty-msg">No games match the selected filters.</div>
-  </div>
+  <section class="table-section">
+    <div class="table-overflow">
+      <table>
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Players</th>
+            <th>Price</th>
+            <th>Pros</th>
+            <th>Cons</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="empty-msg">
+      <p>No games match this filter.</p>
+      <small>Try selecting a different player count.</small>
+    </div>
+  </section>
+
+  <footer>
+    <p>Prices are approximate and may vary by region or during sales.<br>
+    Information current as of 2025.</p>
+  </footer>
 
   <script>
     const GAMES = [
@@ -217,13 +379,13 @@
         pros: [
           'Classic campaigns still hold up',
           'Massive modding community with new content',
-          'Tight teamplay mechanics under pressure',
+          'Tight teamplay under pressure',
           'Still has an active player base',
         ],
         cons: [
-          'Aging engine and visuals (Source, 2009)',
-          'Matchmaking can be slow outside peak hours',
-          'No official new content in many years',
+          'Aging engine and visuals (2009)',
+          'Matchmaking slow outside peak hours',
+          'No official new content in years',
         ],
       },
       {
@@ -234,12 +396,12 @@
           'Billions of procedurally generated guns',
           'Witty writing and memorable characters',
           'Scales well for 2–4 players',
-          'Enormous amount of DLC content',
+          'Enormous DLC content library',
         ],
         cons: [
           'Older art style and UI',
-          'Difficulty spikes sharply without full squad',
-          'Some DLC is near-essential but costs extra',
+          'Difficulty spikes without a full squad',
+          'Key DLC costs extra on top of base price',
         ],
       },
       {
@@ -247,10 +409,10 @@
         maxPlayers: 4,
         price: '~$30',
         pros: [
-          'Improved gunplay and movement over Borderlands 2',
+          'Improved gunplay and movement over BL2',
           'Huge variety of playable vault hunters',
           'Tons of endgame content and raids',
-          'Seamless drop-in/drop-out co-op',
+          'Seamless drop-in / drop-out co-op',
         ],
         cons: [
           'Story and humor divisive compared to BL2',
@@ -265,7 +427,7 @@
         pros: [
           'Gruesome, satisfying gunplay',
           'Up to 6 players with distinct perk classes',
-          'Large roster of maps and Zed enemies',
+          'Large roster of maps and enemy types',
           'Long-term free content updates',
         ],
         cons: [
@@ -281,13 +443,13 @@
         pros: [
           'Huge variety of heists and game modes',
           'Deep skill tree and build customization',
-          'Active community and massive mod support',
+          'Active community with massive mod support',
           'Very cheap — frequent sales',
         ],
         cons: [
           'Overwhelming DLC catalogue (100+ packs)',
           'Steep learning curve for new players',
-          'Older graphics and some dated mechanics',
+          'Older graphics and dated mechanics',
         ],
       },
       {
@@ -296,8 +458,8 @@
         price: '~$25',
         pros: [
           'Excellent roguelite loop with item synergies',
-          'Up to 4 players with diverse character kits',
           'Each run feels meaningfully different',
+          'Diverse character kits',
           'Satisfying difficulty escalation',
         ],
         cons: [
@@ -313,12 +475,12 @@
         pros: [
           'Modern spiritual successor to Left 4 Dead',
           'Card deck system adds strategic depth',
-          'Polished gunplay and graphics',
+          'Polished gunplay and visuals',
           'Active developer support post-launch',
         ],
         cons: [
           'Mixed PvP mode compared to campaign',
-          'Higher price point than older co-op shooters',
+          'Higher price than older co-op shooters',
           'Card system can feel overwhelming early on',
         ],
       },
@@ -327,15 +489,15 @@
         maxPlayers: 4,
         price: '~$40',
         pros: [
-          'Intense friendly-fire adds real tension',
-          'Galactic war gives community a shared goal',
+          'Friendly fire adds real tactical tension',
+          'Galactic war gives the community a shared goal',
           'Excellent stratagem variety and customization',
           'Consistently fun moment-to-moment action',
         ],
         cons: [
           'Server issues at launch affected early players',
-          'Steep difficulty on higher missions for new players',
-          'Controversial PSN requirement on some platforms',
+          'Steep difficulty on higher missions',
+          'Controversial PSN requirement on PC',
         ],
       },
       {
@@ -343,66 +505,77 @@
         maxPlayers: 4,
         price: 'Free',
         pros: [
-          'Free to play with no pay-to-win mechanics',
+          'Free to play — no pay-to-win mechanics',
           'Enormous content library after years of updates',
           'Fluid movement and combat system',
-          'Generous drop rates for in-game currency',
+          'Generous in-game currency drop rates',
         ],
         cons: [
           'Overwhelming new player experience',
           'Heavy grind to unlock certain Warframes',
-          'Older content feels dated compared to new missions',
+          'Older content feels dated vs. new missions',
         ],
       },
     ];
 
-    const TOTAL   = GAMES.length;
-    const tbody   = document.getElementById('tbody');
-    const countEl = document.getElementById('count');
-    const emptyMsg = document.getElementById('empty-msg');
-    const fPlayers = document.getElementById('f-players');
-
-    countEl.textContent = TOTAL;
-    document.querySelector('.count').innerHTML =
-      `Showing <span id="count">${TOTAL}</span> of ${TOTAL} games`;
-
-    function matchesPlayerFilter(maxPlayers, filter) {
-      if (filter === 'all')   return true;
-      if (filter === '2')     return maxPlayers <= 2;
-      if (filter === '4')     return maxPlayers <= 4;
-      if (filter === '6plus') return maxPlayers >= 6;
-      return true;
-    }
+    const TOTAL  = GAMES.length;
+    const tbody  = document.getElementById('tbody');
+    const empty  = document.getElementById('empty-msg');
+    const countEl = document.getElementById('filter-count');
 
     function buildRow(g) {
       const tr = document.createElement('tr');
       tr.dataset.players = g.maxPlayers;
-      const pros = g.pros.map(p => `<li>${p}</li>`).join('');
-      const cons = g.cons.map(c => `<li>${c}</li>`).join('');
+
+      const priceClass = g.price === 'Free' ? 'price-tag price-free' : 'price-tag';
+      const pros = g.pros.map(p =>
+        `<li><span class="icon">✓</span><span>${p}</span></li>`).join('');
+      const cons = g.cons.map(c =>
+        `<li><span class="icon">✕</span><span>${c}</span></li>`).join('');
+
       tr.innerHTML = `
-        <td class="game-name">${g.name}</td>
-        <td class="players"><span class="players-icon">♟</span>${g.maxPlayers === 1 ? '1' : g.maxPlayers}</td>
-        <td class="price">${g.price}</td>
-        <td><ul class="pros-list">${pros}</ul></td>
-        <td><ul class="cons-list">${cons}</ul></td>
+        <td><span class="game-name">${g.name}</span></td>
+        <td>
+          <span class="player-badge">
+            <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="5" r="3"/><path d="M2 13c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+            ${g.maxPlayers}
+          </span>
+        </td>
+        <td><span class="${priceClass}">${g.price}</span></td>
+        <td><ul class="list pros-list">${pros}</ul></td>
+        <td><ul class="list cons-list">${cons}</ul></td>
       `;
       return tr;
     }
 
-    function applyFilters() {
-      const players = fPlayers.value;
-      let visible = 0;
-      tbody.querySelectorAll('tr').forEach(tr => {
-        const show = matchesPlayerFilter(+tr.dataset.players, players);
-        tr.style.display = show ? '' : 'none';
-        if (show) visible++;
-      });
-      document.getElementById('count').textContent = visible;
-      emptyMsg.style.display = visible === 0 ? 'block' : 'none';
+    GAMES.forEach(g => tbody.appendChild(buildRow(g)));
+
+    function matchPlayer(max, filter) {
+      if (filter === 'all')   return true;
+      if (filter === '2')     return max <= 2;
+      if (filter === '4')     return max <= 4;
+      if (filter === '6plus') return max >= 6;
+      return true;
     }
 
-    GAMES.forEach(g => tbody.appendChild(buildRow(g)));
-    fPlayers.addEventListener('change', applyFilters);
+    function applyFilter(filter) {
+      let visible = 0;
+      tbody.querySelectorAll('tr').forEach(tr => {
+        const show = matchPlayer(+tr.dataset.players, filter);
+        tr.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+      countEl.innerHTML = `Showing <strong>${visible}</strong> of ${TOTAL} games`;
+      empty.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    document.getElementById('pill-group').addEventListener('click', e => {
+      const btn = e.target.closest('.pill');
+      if (!btn) return;
+      document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilter(btn.dataset.filter);
+    });
   </script>
 </body>
 </html>
