@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Steam Co-op Games</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: 'Courier New', monospace;
+      min-height: 100dvh;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    header {
+      max-width: min(1100px, 98vw);
+      margin: 0 auto 1.5rem;
+    }
+
+    h1 {
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      font-weight: 900;
+      color: #e94560;
+      letter-spacing: 0.15rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .subtitle {
+      font-size: 0.82rem;
+      color: #8b949e;
+    }
+
+    /* ── Filters ───────────────────────────────────────────── */
+    .filters {
+      max-width: min(1100px, 98vw);
+      margin: 0 auto 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .filter-group label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8b949e;
+      white-space: nowrap;
+    }
+
+    .filter-group select {
+      background: #161b22;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 0.3rem 0.6rem;
+      font-family: inherit;
+      font-size: 0.78rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .filter-group select:focus { border-color: #e94560; }
+
+    .count {
+      margin-left: auto;
+      font-size: 0.72rem;
+      color: #8b949e;
+      white-space: nowrap;
+    }
+
+    .count span { color: #e94560; font-weight: 700; }
+
+    /* ── Table wrapper ─────────────────────────────────────── */
+    .table-wrap {
+      max-width: min(1100px, 98vw);
+      margin: 0 auto;
+      overflow-x: auto;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    thead {
+      background: #161b22;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    thead th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #8b949e;
+      border-bottom: 1px solid #30363d;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #21262d;
+      transition: background 0.12s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    tbody tr:hover { background: #161b22; }
+
+    tbody td {
+      padding: 0.85rem 1rem;
+      font-size: 0.82rem;
+      vertical-align: top;
+    }
+
+    /* ── Game name ─────────────────────────────────────────── */
+    .game-name {
+      font-weight: 700;
+      color: #e6edf3;
+      white-space: nowrap;
+    }
+
+    /* ── Genre badge ───────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .badge-shooter    { background: #1f2d3d; color: #58a6ff; border: 1px solid #1f6feb; }
+    .badge-survival   { background: #1a2e1a; color: #3fb950; border: 1px solid #238636; }
+    .badge-rpg        { background: #2d1f3d; color: #bc8cff; border: 1px solid #8957e5; }
+    .badge-puzzle     { background: #2d2a1f; color: #e3b341; border: 1px solid #9e6a03; }
+    .badge-horror     { background: #2d1f1f; color: #ff7b72; border: 1px solid #da3633; }
+    .badge-adventure  { background: #1f2d2a; color: #39d353; border: 1px solid #26a641; }
+    .badge-sandbox    { background: #2a2d1f; color: #d2a679; border: 1px solid #9c6b3a; }
+    .badge-actionrpg  { background: #2d221f; color: #f0883e; border: 1px solid #bd561d; }
+
+    /* ── Players cell ──────────────────────────────────────── */
+    .players {
+      white-space: nowrap;
+      color: #e6edf3;
+    }
+
+    .players-icon { color: #e94560; margin-right: 0.25rem; }
+
+    /* ── Price ─────────────────────────────────────────────── */
+    .price { color: #8b949e; white-space: nowrap; }
+
+    /* ── Pros / Cons lists ─────────────────────────────────── */
+    .pros-list, .cons-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .pros-list li::before {
+      content: '+ ';
+      color: #3fb950;
+      font-weight: 700;
+    }
+
+    .cons-list li::before {
+      content: '- ';
+      color: #f85149;
+      font-weight: 700;
+    }
+
+    .pros-list li, .cons-list li {
+      font-size: 0.78rem;
+      color: #c9d1d9;
+      line-height: 1.5;
+    }
+
+    /* ── Empty state ───────────────────────────────────────── */
+    #empty-msg {
+      display: none;
+      padding: 3rem;
+      text-align: center;
+      color: #8b949e;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Steam Co-op Games</h1>
+    <p class="subtitle">Pros &amp; cons of popular online co-op titles — filter by genre or player count</p>
+  </header>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label for="f-genre">Genre</label>
+      <select id="f-genre">
+        <option value="all">All genres</option>
+        <option value="Shooter">Shooter</option>
+        <option value="Survival">Survival</option>
+        <option value="RPG">RPG</option>
+        <option value="Action RPG">Action RPG</option>
+        <option value="Puzzle">Puzzle</option>
+        <option value="Horror">Horror</option>
+        <option value="Adventure">Adventure</option>
+        <option value="Sandbox">Sandbox</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="f-players">Players</label>
+      <select id="f-players">
+        <option value="all">Any count</option>
+        <option value="2">2 players only</option>
+        <option value="4">Up to 4</option>
+        <option value="6plus">6 or more</option>
+      </select>
+    </div>
+    <div class="count">Showing <span id="count">12</span> of 12 games</div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="game-table">
+      <thead>
+        <tr>
+          <th>Game</th>
+          <th>Genre</th>
+          <th>Players</th>
+          <th>Price</th>
+          <th>Pros</th>
+          <th>Cons</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div id="empty-msg">No games match the selected filters.</div>
+  </div>
+
+  <script>
+    const GAMES = [
+      {
+        name: 'Deep Rock Galactic',
+        genre: 'Shooter',
+        maxPlayers: 4,
+        price: '~$30',
+        pros: [
+          'Excellent friendly-fire forgiveness',
+          'Every class feels vital to the team',
+          'Procedurally generated caves keep runs fresh',
+          'Strong player vs. developer relationship',
+        ],
+        cons: [
+          'Late-game grind can feel repetitive',
+          'No offline solo matchmaking with randoms',
+          'Limited story or narrative depth',
+        ],
+      },
+      {
+        name: 'Valheim',
+        genre: 'Survival',
+        maxPlayers: 10,
+        price: '~$20',
+        pros: [
+          'Beautiful Norse world with satisfying exploration',
+          'Up to 10 players on a shared world',
+          'Deep building and crafting systems',
+          'Frequent free content updates',
+        ],
+        cons: [
+          'Server hosting required for large groups',
+          'Progress feels gated without all players online',
+          'Combat is simple early on',
+        ],
+      },
+      {
+        name: 'It Takes Two',
+        genre: 'Adventure',
+        maxPlayers: 2,
+        price: '~$40',
+        pros: [
+          'Incredibly varied gameplay mechanics',
+          'Built specifically for 2-player co-op',
+          'Friend\'s Pass lets one player share for free',
+          'Award-winning narrative and level design',
+        ],
+        cons: [
+          'Strictly 2 players — no solo or larger groups',
+          'Short playtime (~12 hours)',
+          'Limited replay value once finished',
+        ],
+      },
+      {
+        name: 'Portal 2',
+        genre: 'Puzzle',
+        maxPlayers: 2,
+        price: '~$10',
+        pros: [
+          'Brilliantly designed co-op puzzles',
+          'Hilarious writing and voice acting',
+          'Free co-op — just one copy needed',
+          'Great for introducing newcomers to gaming',
+        ],
+        cons: [
+          'Only 2 players in co-op mode',
+          'Co-op campaign is shorter than single-player',
+          'Puzzles can cause frustration if communication breaks down',
+        ],
+      },
+      {
+        name: 'Stardew Valley',
+        genre: 'RPG',
+        maxPlayers: 4,
+        price: '~$15',
+        pros: [
+          'Relaxed, low-pressure co-op experience',
+          'Rich farming, fishing, and dungeon content',
+          'Highly moddable community',
+          'Excellent for couples or close friends',
+        ],
+        cons: [
+          'One host owns the save — others are guests',
+          'Slower pace may not suit all players',
+          'Online multiplayer setup can be finicky',
+        ],
+      },
+      {
+        name: 'Left 4 Dead 2',
+        genre: 'Shooter',
+        maxPlayers: 4,
+        price: '~$10',
+        pros: [
+          'Classic, endlessly replayable campaigns',
+          'Huge modding community with new content',
+          'Tight teamplay mechanics under pressure',
+          'Still has an active player base',
+        ],
+        cons: [
+          'Aging visuals and engine (Source, 2009)',
+          'No cross-play with consoles',
+          'Matchmaking can be slow outside peak hours',
+        ],
+      },
+      {
+        name: "Don't Starve Together",
+        genre: 'Survival',
+        maxPlayers: 6,
+        price: '~$15',
+        pros: [
+          'Unique gothic art style',
+          'Deep survival and crafting loop',
+          'Up to 6 players on dedicated servers',
+          'Regular free seasonal updates',
+        ],
+        cons: [
+          'Brutally difficult for newcomers',
+          'High friction when one player dies and loses progress',
+          'Punishing boss encounters can discourage casual groups',
+        ],
+      },
+      {
+        name: 'Divinity: Original Sin 2',
+        genre: 'RPG',
+        maxPlayers: 4,
+        price: '~$45',
+        pros: [
+          'Exceptional turn-based tactical combat',
+          'Massive branching narrative with co-op dialogue',
+          'Highly replayable with different class combinations',
+          'One of the best co-op RPGs ever made',
+        ],
+        cons: [
+          'High barrier to entry for newcomers to the genre',
+          'One player often drives the story faster than others',
+          'Long sessions required — hard to play in short bursts',
+        ],
+      },
+      {
+        name: 'Monster Hunter: World',
+        genre: 'Action RPG',
+        maxPlayers: 4,
+        price: '~$30',
+        pros: [
+          'Satisfying gear progression loop',
+          'Each monster is a memorable boss encounter',
+          'Co-op scales difficulty appropriately',
+          'Hundreds of hours of content with Iceborne DLC',
+        ],
+        cons: [
+          'Co-op only unlocked after completing quests solo first',
+          'Matchmaking uses session codes, not automatic lobbies',
+          'Large time investment required to see end-game content',
+        ],
+      },
+      {
+        name: 'Terraria',
+        genre: 'Sandbox',
+        maxPlayers: 8,
+        price: '~$10',
+        pros: [
+          'Enormous amount of content for the price',
+          'Up to 8 players in one world',
+          'Constant free updates over 10+ years',
+          'Works on almost any hardware',
+        ],
+        cons: [
+          'Pixelated 2D style is not for everyone',
+          'Can feel overwhelming without a guide',
+          'Progress is tied to the world host\'s save',
+        ],
+      },
+      {
+        name: 'Phasmophobia',
+        genre: 'Horror',
+        maxPlayers: 4,
+        price: '~$14',
+        pros: [
+          'Genuinely terrifying with a group',
+          'Voice recognition adds immersion',
+          'Frequent content and difficulty updates',
+          'Strong replayability across ghost types',
+        ],
+        cons: [
+          'Experience degrades solo or in small groups',
+          'Repetitive after many hours',
+          'Occasional ghost AI bugs break immersion',
+        ],
+      },
+      {
+        name: 'Raft',
+        genre: 'Survival',
+        maxPlayers: 8,
+        price: '~$20',
+        pros: [
+          'Creative ocean survival premise',
+          'Up to 8 players on one raft',
+          'Relaxing pacing compared to other survival games',
+          'Story islands add structure to exploration',
+        ],
+        cons: [
+          'Late-game content is sparse',
+          'Performance drops with many players on large rafts',
+          'Lacks the depth of other survival titles',
+        ],
+      },
+    ];
+
+    const tbody    = document.getElementById('tbody');
+    const countEl  = document.getElementById('count');
+    const emptyMsg = document.getElementById('empty-msg');
+    const fGenre   = document.getElementById('f-genre');
+    const fPlayers = document.getElementById('f-players');
+
+    const BADGE_CLASS = {
+      'Shooter':    'badge-shooter',
+      'Survival':   'badge-survival',
+      'RPG':        'badge-rpg',
+      'Action RPG': 'badge-actionrpg',
+      'Puzzle':     'badge-puzzle',
+      'Horror':     'badge-horror',
+      'Adventure':  'badge-adventure',
+      'Sandbox':    'badge-sandbox',
+    };
+
+    function matchesPlayerFilter(maxPlayers, filter) {
+      if (filter === 'all')    return true;
+      if (filter === '2')      return maxPlayers === 2;
+      if (filter === '4')      return maxPlayers <= 4;
+      if (filter === '6plus')  return maxPlayers >= 6;
+      return true;
+    }
+
+    function buildRow(g) {
+      const tr = document.createElement('tr');
+      tr.dataset.genre   = g.genre;
+      tr.dataset.players = g.maxPlayers;
+
+      const badgeClass = BADGE_CLASS[g.genre] || 'badge-shooter';
+      const pros = g.pros.map(p => `<li>${p}</li>`).join('');
+      const cons = g.cons.map(c => `<li>${c}</li>`).join('');
+
+      tr.innerHTML = `
+        <td class="game-name">${g.name}</td>
+        <td><span class="badge ${badgeClass}">${g.genre}</span></td>
+        <td class="players"><span class="players-icon">♟</span>${g.maxPlayers}</td>
+        <td class="price">${g.price}</td>
+        <td><ul class="pros-list">${pros}</ul></td>
+        <td><ul class="cons-list">${cons}</ul></td>
+      `;
+      return tr;
+    }
+
+    function applyFilters() {
+      const genre   = fGenre.value;
+      const players = fPlayers.value;
+      let visible   = 0;
+
+      tbody.querySelectorAll('tr').forEach(tr => {
+        const gMatch = genre === 'all' || tr.dataset.genre === genre;
+        const pMatch = matchesPlayerFilter(+tr.dataset.players, players);
+        const show   = gMatch && pMatch;
+        tr.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+
+      countEl.textContent = visible;
+      emptyMsg.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    // Build all rows once
+    GAMES.forEach(g => tbody.appendChild(buildRow(g)));
+
+    fGenre.addEventListener('change',   applyFilters);
+    fPlayers.addEventListener('change', applyFilters);
+  </script>
+</body>
+</html>
